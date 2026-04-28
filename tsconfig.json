@@ -24,5 +24,12 @@
     "allowJs": true,
     "checkJs": false
   },
-  "include": ["src/lib/**/*.ts"]
+  "include": [
+    "src/lib/**/*.ts",
+    "src/hooks/**/*.ts",
+    "src/components/**/*.ts",
+    "src/components/**/*.tsx",
+    "src/App.tsx",
+    "src/types/**/*.ts"
+  ]
 }

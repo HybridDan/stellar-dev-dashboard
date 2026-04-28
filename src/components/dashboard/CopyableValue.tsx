@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, type MouseEvent } from 'react'
 import { Check, Copy } from 'lucide-react'
+import type { CopyableValueProps } from '../../types/components'
 
-async function copyText(value) {
+async function copyText(value: string): Promise<void> {
   if (navigator.clipboard?.writeText) {
-    return navigator.clipboard.writeText(value)
+    await navigator.clipboard.writeText(value)
+    return
   }
 
   const textarea = document.createElement('textarea')
@@ -13,6 +15,7 @@ async function copyText(value) {
   textarea.style.left = '-9999px'
   document.body.appendChild(textarea)
   textarea.select()
+  // execCommand is deprecated but kept as a final fallback for very old browsers.
   document.execCommand('copy')
   document.body.removeChild(textarea)
 }
@@ -24,7 +27,7 @@ export default function CopyableValue({
   textStyle,
   containerStyle,
   buttonStyle,
-}) {
+}: CopyableValueProps) {
   const [copied, setCopied] = useState(false)
 
   useEffect(() => {
@@ -33,7 +36,7 @@ export default function CopyableValue({
     return () => window.clearTimeout(timeout)
   }, [copied])
 
-  const handleCopy = async (event) => {
+  const handleCopy = async (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault()
     event.stopPropagation()
     if (!value) return
@@ -46,14 +49,18 @@ export default function CopyableValue({
   }
 
   return (
-    <span style={{
-      display: 'inline-flex',
-      alignItems: 'center',
-      gap: '6px',
-      minWidth: 0,
-      ...containerStyle,
-    }}>
-      <span style={{ display: 'inline-block', minWidth: 0, ...textStyle }}>{children ?? value}</span>
+    <span
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: '6px',
+        minWidth: 0,
+        ...containerStyle,
+      }}
+    >
+      <span style={{ display: 'inline-block', minWidth: 0, ...textStyle }}>
+        {children ?? value}
+      </span>
       <button
         type="button"
         onClick={handleCopy}
@@ -72,8 +79,12 @@ export default function CopyableValue({
           transition: 'var(--transition)',
           ...buttonStyle,
         }}
-        onMouseEnter={e => { if (!copied) e.currentTarget.style.color = 'var(--cyan)' }}
-        onMouseLeave={e => { if (!copied) e.currentTarget.style.color = 'var(--text-muted)' }}
+        onMouseEnter={(e) => {
+          if (!copied) e.currentTarget.style.color = 'var(--cyan)'
+        }}
+        onMouseLeave={(e) => {
+          if (!copied) e.currentTarget.style.color = 'var(--text-muted)'
+        }}
       >
         {copied ? <Check size={14} /> : <Copy size={14} />}
       </button>

@@ -1,22 +1,47 @@
-import React, { useState } from 'react'
+import React, { useState, type CSSProperties, type KeyboardEvent } from 'react'
 import { useStore } from '../../lib/store'
-import { isValidPublicKey, fetchAccount, fetchTransactions, fetchOperations } from '../../lib/stellar'
+import {
+  isValidPublicKey,
+  fetchAccount,
+  fetchTransactions,
+  fetchOperations,
+} from '../../lib/stellar'
 import { useResponsive } from '../../hooks/useResponsive'
 import { ResponsiveGrid } from '../layout/ResponsiveContainer'
 
+interface FeatureTile {
+  icon: string
+  label: string
+  desc: string
+}
+
+const FEATURES: FeatureTile[] = [
+  { icon: '◉', label: 'Account & Balances', desc: 'Assets, sequence number, thresholds' },
+  { icon: '⇄', label: 'Transactions', desc: 'Full history, operations, memos' },
+  { icon: '◻', label: 'Soroban Contracts', desc: 'Contract data & interaction' },
+]
+
 export default function ConnectPanel() {
-  const [input, setInput] = useState('')
-  const [error, setError] = useState('')
+  const [input, setInput] = useState<string>('')
+  const [error, setError] = useState<string>('')
   const { isMobile, isTablet } = useResponsive()
   const {
-    network, setConnectedAddress, setAccountData,
-    setAccountLoading, setTransactions, setTxLoading,
-    setOperations, setOpsLoading, setActiveTab,
-    setTxNextCursor, setTxHasMore,
-    setOpsNextCursor, setOpsHasMore,
+    network,
+    setConnectedAddress,
+    setAccountData,
+    setAccountLoading,
+    setTransactions,
+    setTxLoading,
+    setOperations,
+    setOpsLoading,
+    setActiveTab,
+    setTxNextCursor,
+    setTxHasMore,
+    setOpsNextCursor,
+    setOpsHasMore,
   } = useStore()
 
-  async function handleConnect() {
+  async function handleConnect(): Promise<void> {
     const addr = input.trim()
     if (!isValidPublicKey(addr)) {
       setError('Invalid Stellar public key')
@@ -30,7 +55,6 @@ export default function ConnectPanel() {
       setAccountData(account)
       setActiveTab('overview')
 
-      // Fetch tx & ops in background
       setTxLoading(true)
       setOpsLoading(true)
       fetchTransactions(addr, network)
@@ -62,15 +86,14 @@ export default function ConnectPanel() {
         .finally(() => {
           setOpsLoading(false)
         })
-    } catch (e) {
+    } catch {
       setError('Account not found on ' + network)
     } finally {
       setAccountLoading(false)
     }
   }
 
-  // Responsive styles
-  const containerStyles = {
+  const containerStyles: CSSProperties = {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -80,7 +103,7 @@ export default function ConnectPanel() {
     padding: isMobile ? '20px' : '0',
   }
 
-  const titleStyles = {
+  const titleStyles: CSSProperties = {
     fontFamily: 'var(--font-display)',
     fontSize: isMobile ? '32px' : isTablet ? '36px' : '42px',
     fontWeight: 800,
@@ -90,14 +113,14 @@ export default function ConnectPanel() {
     marginBottom: '10px',
   }
 
-  const subtitleStyles = {
+  const subtitleStyles: CSSProperties = {
     fontFamily: 'var(--font-display)',
     fontSize: isMobile ? '16px' : '20px',
     color: 'var(--text-secondary)',
     fontWeight: 500,
   }
 
-  const inputContainerStyles = {
+  const inputContainerStyles: CSSProperties = {
     display: 'flex',
     flexDirection: isMobile ? 'column' : 'row',
     gap: isMobile ? '12px' : '10px',
@@ -110,18 +133,18 @@ export default function ConnectPanel() {
     maxWidth: isMobile ? '100%' : '540px',
   }
 
-  const inputStyles = {
+  const inputStyles: CSSProperties = {
     flex: 1,
     background: 'transparent',
     border: 'none',
     outline: 'none',
     color: 'var(--text-primary)',
-    fontSize: isMobile ? '16px' : '13px', // Larger on mobile to prevent zoom
+    fontSize: isMobile ? '16px' : '13px',
     fontFamily: 'var(--font-mono)',
-    padding: isMobile ? '0' : '0',
+    padding: 0,
   }
 
-  const buttonStyles = {
+  const buttonStyles: CSSProperties = {
     padding: isMobile ? '12px 20px' : '9px 20px',
     background: 'var(--cyan)',
     color: 'var(--bg-base)',
@@ -138,17 +161,23 @@ export default function ConnectPanel() {
     minHeight: isMobile ? 'var(--touch-target)' : 'auto',
   }
 
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') void handleConnect()
+  }
+
   return (
     <div style={containerStyles}>
       <div style={{ textAlign: 'center' }}>
         <div style={titleStyles}>✦ STELLAR</div>
         <div style={subtitleStyles}>Developer Dashboard</div>
-        <div style={{ 
-          fontSize: isMobile ? '13px' : '12px', 
-          color: 'var(--text-muted)', 
-          marginTop: '8px',
-          padding: isMobile ? '0 20px' : '0',
-        }}>
+        <div
+          style={{
+            fontSize: isMobile ? '13px' : '12px',
+            color: 'var(--text-muted)',
+            marginTop: '8px',
+            padding: isMobile ? '0 20px' : '0',
+          }}
+        >
           Enter a public key to explore accounts, transactions & contracts
         </div>
       </div>
@@ -157,28 +186,37 @@ export default function ConnectPanel() {
         <div style={inputContainerStyles}>
           <input
             value={input}
-            onChange={e => { setInput(e.target.value); setError('') }}
-            onKeyDown={e => e.key === 'Enter' && handleConnect()}
+            onChange={(e) => {
+              setInput(e.target.value)
+              setError('')
+            }}
+            onKeyDown={handleKeyDown}
             placeholder="G... public key"
             style={inputStyles}
           />
           <button
-            onClick={handleConnect}
+            onClick={() => void handleConnect()}
             style={buttonStyles}
-            onMouseEnter={e => e.currentTarget.style.background = 'var(--cyan-dim)'}
-            onMouseLeave={e => e.currentTarget.style.background = 'var(--cyan)'}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'var(--cyan-dim)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'var(--cyan)'
+            }}
           >
             CONNECT →
           </button>
         </div>
         {error && (
-          <div style={{ 
-            marginTop: '8px', 
-            fontSize: '12px', 
-            color: 'var(--red)', 
-            paddingLeft: '4px',
-            textAlign: isMobile ? 'center' : 'left',
-          }}>
+          <div
+            style={{
+              marginTop: '8px',
+              fontSize: '12px',
+              color: 'var(--red)',
+              paddingLeft: '4px',
+              textAlign: isMobile ? 'center' : 'left',
+            }}
+          >
             ✗ {error}
           </div>
         )}
@@ -187,38 +225,44 @@ export default function ConnectPanel() {
       <ResponsiveGrid
         columns={{ mobile: 1, tablet: 3, desktop: 3 }}
         gap={{ mobile: '12px', tablet: '12px', desktop: '12px' }}
-        style={{ 
-          width: '100%', 
+        style={{
+          width: '100%',
           maxWidth: isMobile ? '100%' : '540px',
         }}
       >
-        {[
-          { icon: '◉', label: 'Account & Balances', desc: 'Assets, sequence number, thresholds' },
-          { icon: '⇄', label: 'Transactions', desc: 'Full history, operations, memos' },
-          { icon: '◻', label: 'Soroban Contracts', desc: 'Contract data & interaction' },
-        ].map(f => (
-          <div key={f.label} style={{
-            background: 'var(--bg-elevated)',
-            border: '1px solid var(--border)',
-            borderRadius: 'var(--radius-md)',
-            padding: isMobile ? '16px' : '14px',
-            textAlign: isMobile ? 'center' : 'left',
-          }}>
-            <div style={{ 
-              fontSize: isMobile ? '24px' : '18px', 
-              marginBottom: '6px' 
-            }}>{f.icon}</div>
-            <div style={{ 
-              fontSize: isMobile ? '14px' : '12px', 
-              fontWeight: 600, 
-              color: 'var(--text-primary)', 
-              marginBottom: '3px' 
-            }}>{f.label}</div>
-            <div style={{ 
-              fontSize: isMobile ? '12px' : '11px', 
-              color: 'var(--text-muted)', 
-              lineHeight: 1.4 
-            }}>{f.desc}</div>
+        {FEATURES.map((f) => (
+          <div
+            key={f.label}
+            style={{
+              background: 'var(--bg-elevated)',
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--radius-md)',
+              padding: isMobile ? '16px' : '14px',
+              textAlign: isMobile ? 'center' : 'left',
+            }}
+          >
+            <div style={{ fontSize: isMobile ? '24px' : '18px', marginBottom: '6px' }}>
+              {f.icon}
+            </div>
+            <div
+              style={{
+                fontSize: isMobile ? '14px' : '12px',
+                fontWeight: 600,
+                color: 'var(--text-primary)',
+                marginBottom: '3px',
+              }}
+            >
+              {f.label}
+            </div>
+            <div
+              style={{
+                fontSize: isMobile ? '12px' : '11px',
+                color: 'var(--text-muted)',
+                lineHeight: 1.4,
+              }}
+            >
+              {f.desc}
+            </div>
           </div>
         ))}
       </ResponsiveGrid>

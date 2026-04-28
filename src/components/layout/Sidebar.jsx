@@ -14,6 +14,8 @@ const NAV_ITEMS = [
   { id: 'search', label: 'Search', icon: '🔍' },
   { id: 'network', label: 'Network', icon: '◎' },
   { id: 'realtime', label: 'Real-Time', icon: '◉' },
+  { id: 'liveActivity', label: 'Live Activity', icon: '⚡' },
+  { id: 'cacheStats', label: 'Cache Stats', icon: '⊞' },
   { id: 'builder', label: 'Builder', icon: '⚒' },
   { id: 'faucet', label: 'Faucet', icon: '⬡' },
   { id: 'wallet', label: 'Wallet', icon: '⊡' },

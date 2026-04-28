@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react'
+import type { ResponsiveBreakpoints, ResponsiveState } from '../types/components'
 
-const BREAKPOINTS = {
+const BREAKPOINTS: ResponsiveBreakpoints = {
   mobile: 768,
   tablet: 1024,
   desktop: 1200,
 }
 
-export function useResponsive() {
-  const [windowWidth, setWindowWidth] = useState(
-    typeof window !== 'undefined' ? window.innerWidth : 1200
+export function useResponsive(): ResponsiveState {
+  const [windowWidth, setWindowWidth] = useState<number>(
+    typeof window !== 'undefined' ? window.innerWidth : 1200,
   )
 
   useEffect(() => {
@@ -33,8 +34,8 @@ export function useResponsive() {
   }
 }
 
-export function useMediaQuery(query) {
-  const [matches, setMatches] = useState(false)
+export function useMediaQuery(query: string): boolean {
+  const [matches, setMatches] = useState<boolean>(false)
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -42,9 +43,9 @@ export function useMediaQuery(query) {
     const media = window.matchMedia(query)
     setMatches(media.matches)
 
-    const listener = (e) => setMatches(e.matches)
+    const listener = (e: MediaQueryListEvent) => setMatches(e.matches)
     media.addEventListener('change', listener)
-    
+
     return () => media.removeEventListener('change', listener)
   }, [query])
 

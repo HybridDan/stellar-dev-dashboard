@@ -1,1 +1,0 @@
-import { useMemo } from 'react'; import { SearchEngine } from '../lib/searchEngine'; export default function useSearch(items, query){ return useMemo(()=>new SearchEngine().searchTransactions(items||[],query||''),[items,query]); }
