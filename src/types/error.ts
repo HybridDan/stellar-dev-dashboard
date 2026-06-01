@@ -1,5 +1,7 @@
 export interface ErrorDetails {
-  timestamp?: number;
+  originalError?: unknown;
+  message?: string;
+  timestamp?: string | number;
   url?: string;
   userAgent?: string;
   category?: string;
@@ -12,4 +14,5 @@ export interface ErrorDetails {
   };
   helpLinks?: Array<{ label: string; url: string }>;
   context?: string;
+  [key: string]: unknown;
 }

@@ -2,6 +2,7 @@ import React, { Component, ReactElement, ReactNode } from 'react';
 import ErrorFallback from './ErrorFallback';
 import { handleGlobalError, retryWithBackoff as retryUtil } from '../utils/errorHandler';
 import { createLogger } from '../utils/logger';
+import { ErrorDetails } from '../types/error';
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -13,7 +14,7 @@ interface ErrorBoundaryProps {
 interface ErrorBoundaryState {
   hasError: boolean;
   error: Error | null;
-  errorDetails: any;
+  errorDetails: ErrorDetails | null;
   retryCount: number;
   isRetrying: boolean;
 }
