@@ -1,5 +1,6 @@
 import React from 'react';
 import { useStore } from '../../lib/store';
+import { useNavigate } from 'react-router-dom'
 
 interface NavItem {
   id: string;
@@ -17,7 +18,13 @@ const QUICK_NAV: NavItem[] = [
 ];
 
 export default function MobileNavigation() {
-  const { activeTab, setActiveTab } = useStore();
+  const { activeTab, setActiveTab } = useStore()
+  const navigate = useNavigate()
+
+  const handleSelect = (tabId) => {
+    setActiveTab(tabId)
+    navigate(`/${tabId}`)
+  }
 
   return (
     <nav
@@ -30,11 +37,12 @@ export default function MobileNavigation() {
         return (
           <button
             key={item.id}
-            onClick={() => setActiveTab(item.id)}
+            onClick={() => handleSelect(item.id)}
             aria-label={item.label}
             aria-current={isActive ? 'page' : undefined}
             style={{
               display: 'flex',
+              position: 'relative',
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
@@ -47,7 +55,6 @@ export default function MobileNavigation() {
               cursor: 'pointer',
               transition: 'color 180ms ease',
               padding: '4px 0',
-              position: 'relative'
             }}
           >
             <span style={{ fontSize: '18px', lineHeight: 1 }}>{item.icon}</span>
@@ -57,7 +64,7 @@ export default function MobileNavigation() {
             {isActive && (
               <span style={{
                 position: 'absolute',
-                bottom: 'calc(60px - 3px)',
+                top: 0,
                 width: '20px',
                 height: '2px',
                 background: 'var(--cyan)',
